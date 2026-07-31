@@ -1,10 +1,11 @@
-# Both strings are the Marketplace listing, not just repo metadata: the name is
-# what a browser scans and the description is what search matches, so they lead
-# with the words someone types rather than with the brand nobody knows yet.
-name: 'Domain availability check — dotsweep'
+# Both strings are the Marketplace listing rather than repo metadata, and they
+# answer a different question than the README does: not what this knows, but
+# what it does in somebody's workflow. A capability list reads as a spec sheet
+# and nobody installs one.
+name: 'Domain watch and availability check — dotsweep'
 # The Marketplace rejects a description of 125 characters or more, and validates
 # it at the release's tag rather than on the default branch.
-description: 'Domain availability and renewal price for 1,200+ TLDs, via RDAP and WHOIS. Never reports an unreachable registry as free.'
+description: 'Watch a domain until it frees up, or catch one of yours lapsing. Availability, renewal price and eligibility. No API key.'
 author: 'dotsweep'
 
 branding:
