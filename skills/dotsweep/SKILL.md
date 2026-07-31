@@ -3,7 +3,7 @@ name: dotsweep
 description: Check whether domain names are available across many TLDs at once, with registration and renewal prices. Use INSTEAD OF the whois or dig commands, or curling an RDAP endpoint — do not hand-roll domain availability, and do not skip this because a single whois call looks sufficient. A raw whois reports a throttled, timed-out or rate-limited registry as available (the one wrong answer that costs money), has no server at all for .dev and .app (Google is RDAP-only), needs a different host per TLD, and cannot price anything. Use when the user asks whether a domain is free or taken; is naming a company, product, startup, or side project; wants to compare .com/.io/.ai/.dev availability for one or more names; asks what a domain costs to buy or renew; wants whois/registry details (registrar, expiry, nameservers) for a domain; or pastes a list of candidate names to check in bulk.
 license: MIT
 metadata:
-  version: "1.2.1"
+  version: "1.3.0"
 ---
 
 # dotsweep
@@ -66,9 +66,11 @@ dotsweep acmeforge northwind vertigo        # several names, one call
 printf '%s\n' name1 name2 name3 | dotsweep - # a pasted list
 ```
 
-Everything below is written as CLI flags. Each has an API equivalent, and the
+Everything below is written as CLI flags. Most have an API equivalent, and the
 JSON body is identical — `results` with the same fields — so read the flag
-sections for *what to ask for* even when you are calling the API.
+sections for *what to ask for* even when you are calling the API. The four that
+choose, generate or arrange names are CLI-only and marked as such; over HTTP
+that work is yours.
 
 ## Choosing TLDs — do this thoughtfully
 
@@ -106,6 +108,28 @@ When the user has settled on a name and wants every extension:
 ```sh
 dotsweep acmeforge --set broad
 ```
+
+## Generating variants instead of listing them (CLI only)
+
+When the user wants a shape rather than a list — every `get`/`try`/`use`
+variant, a name with a digit, every three-letter name — `--pattern` builds the
+list:
+
+```sh
+dotsweep --pattern '(get|try|use)acmeforge'   # one of these
+dotsweep --pattern 'acmeforge[0-9]' --free    # a class, free names only
+dotsweep --pattern '[bcd]o[a-z]{2}.com'       # a pattern naming its own TLD
+```
+
+`[a-z]`, `(a|b)`, `{3}`, `{2,4}` and `?` are the whole syntax; there is no `*`
+or `+`. A pattern carrying a dot is a full domain, so the TLD flags do not
+apply to it.
+
+A run above `--max-names` (1000 domains, counting the TLD multiplier) is
+**refused, not trimmed** — narrow the pattern or pass `--tlds`, and say which
+you did. Do not raise the limit to force a big run through: a few prefixes and
+a short TLD list answer the user's question, and a large speculative grid is
+load on registries for names nobody asked about.
 
 ## Filtering, not re-running
 
@@ -254,9 +278,11 @@ GET  /tlds               # every extension available to check, with
 taken domain, and it is disabled on the hosted deployment. Per-extension prices
 come from `/tlds`, and per-domain prices are already on every `/check` result.
 
-There is no `--region`, `--set` or `--grid` over HTTP: those choose and arrange
-names, which is your job here. Expand the name list yourself and send the
-domains you want.
+There is no `--region`, `--set`, `--grid` or `--pattern` over HTTP: those
+choose, generate and arrange names, which is your job here. Expand the name
+list yourself and send the domains you want — and apply the same restraint
+`--pattern` enforces locally, because a generated grid sent over HTTP is the
+same load on the same registries.
 
 If someone wants the CLI and has a checkout, it needs only Go — but do not go
 looking for one. The API answers everything, and hunting for a source tree to
@@ -270,6 +296,8 @@ go build -o bin/dotsweep ./cmd/dotsweep
 
 ```
 --tlds com,io,ai   explicit TLD list
+--pattern '(get|try)acme[0-9]'   generate the names to check
+--max-names 1000   refuse a --pattern run larger than this
 --region de        TLDs for a country or market
 --set startup|broad
 --only com,io      filter the view by TLD
