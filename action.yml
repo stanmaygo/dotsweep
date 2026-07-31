@@ -1,5 +1,7 @@
 name: 'dotsweep domain check'
-description: 'Check domain availability across any TLD, with price, minimum term and eligibility. Never reports an unreachable registry as available.'
+# The Marketplace rejects a description of 125 characters or more, and validates
+# it at the release's tag rather than on the default branch.
+description: 'Check 1,200+ TLDs for availability, renewal price and eligibility. Never reports an unreachable registry as available.'
 author: 'dotsweep'
 
 branding:
