@@ -14,9 +14,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: python3 scripts/validate-package.py
-      - name: the skills CLI must discover exactly one skill
+      # Both paths hold the prompt, and neither is a symlink: raw.githubusercontent
+      # serves a link's target as the body, so a published symlink is a 24-byte
+      # path string to anything that reads it without cloning. validate-package.py
+      # compares the two; this asserts the shape it cannot see — that they are
+      # regular files, and that skills/ holds exactly one skill to discover.
+      - name: the published files must be files, not links
         run: |
-          test -L SKILL.md || { echo "SKILL.md must be a symlink"; exit 1; }
+          test ! -L SKILL.md   || { echo "SKILL.md must not be a symlink";  exit 1; }
+          test ! -L AGENTS.md  || { echo "AGENTS.md must not be a symlink"; exit 1; }
           test "$(find skills -name SKILL.md | wc -l)" -eq 1
       - name: the plugin manifests must parse
         run: |
