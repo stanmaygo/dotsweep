@@ -28,3 +28,36 @@ jobs:
         run: |
           python3 -c "import json;json.load(open('.claude-plugin/plugin.json'))"
           python3 -c "import json;json.load(open('.claude-plugin/marketplace.json'))"
+
+  # The action calls the live API, so this is the one job that can fail for a
+  # reason outside the repo. It is worth it: nothing else notices when a
+  # response shape changes underneath the classifier, and the failure mode of
+  # that is a name reported registrable when it is not.
+  action:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - id: check
+        uses: ./
+        with:
+          domains: google.com shoes.nike
+          tlds: ''
+      # google.com is registered and .nike is a closed brand TLD. Neither may
+      # ever appear in `available` — a .brand answers RDAP with a real not-found,
+      # which is what made `shoes.nike` read as free before the verdict ranked
+      # `closed` above `status`.
+      - name: a registered name and a brand TLD are never available
+        run: |
+          test "${{ steps.check.outputs.available-count }}" -eq 0
+          test "${{ steps.check.outputs.taken }}" = "google.com"
+          test "${{ steps.check.outputs.closed }}" = "shoes.nike"
+      - name: an unreachable API fails the step rather than answering
+        run: |
+          if bash scripts/action-check.sh; then echo "did not fail"; exit 1; fi
+          test ! -s "$GITHUB_OUTPUT_PROBE"
+        env:
+          INPUT_DOMAINS: anything.com
+          INPUT_API: https://dotsweep-unreachable.invalid
+          GITHUB_OUTPUT: ${{ runner.temp }}/probe.txt
+          GITHUB_OUTPUT_PROBE: ${{ runner.temp }}/probe.txt
+          GITHUB_STEP_SUMMARY: ''
