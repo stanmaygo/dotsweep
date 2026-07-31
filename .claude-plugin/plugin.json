@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "dotsweep",
+  "description": "Check domain availability across many TLDs at once, with registration and renewal price, and the registry's own eligibility rules. Never reports an unreachable or rate-limited registry as available.",
+  "version": "1.2.0",
+  "author": {
+    "name": "dotsweep"
+  },
+  "homepage": "https://dotsweep.com",
+  "license": "MIT",
+  "keywords": [
+    "domains",
+    "domain-availability",
+    "whois",
+    "rdap",
+    "naming",
+    "tld",
+    "pricing"
+  ]
+}

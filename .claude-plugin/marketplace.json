@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-marketplace-manifest.json",
+  "name": "dotsweep",
+  "owner": {
+    "name": "dotsweep",
+    "url": "https://dotsweep.com"
+  },
+  "description": "The dotsweep skill, installable as a Claude Code plugin.",
+  "plugins": [
+    {
+      "name": "dotsweep",
+      "source": "./",
+      "description": "Check domain availability across many TLDs at once, with registration and renewal price, and the registry's own eligibility rules. Never reports an unreachable or rate-limited registry as available.",
+      "license": "MIT",
+      "keywords": [
+        "domains",
+        "domain-availability",
+        "whois",
+        "rdap",
+        "naming",
+        "tld",
+        "pricing"
+      ]
+    }
+  ]
+}

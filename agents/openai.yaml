@@ -1,0 +1,4 @@
+interface:
+  display_name: "dotsweep"
+  short_description: "Domain availability across many TLDs, with renewal price"
+  default_prompt: "Use $dotsweep to check whether these names are available, and what they cost to register and to renew."

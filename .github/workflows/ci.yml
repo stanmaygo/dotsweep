@@ -1,0 +1,24 @@
+name: ci
+
+# Packaging only. There is no engine in this repo to test — the skill calls the
+# hosted API — so what can break here is frontmatter, a version, or the symlink,
+# and every one of those fails silently at install time rather than loudly.
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 scripts/validate-package.py
+      - name: the skills CLI must discover exactly one skill
+        run: |
+          test -L SKILL.md || { echo "SKILL.md must be a symlink"; exit 1; }
+          test "$(find skills -name SKILL.md | wc -l)" -eq 1
+      - name: the plugin manifests must parse
+        run: |
+          python3 -c "import json;json.load(open('.claude-plugin/plugin.json'))"
+          python3 -c "import json;json.load(open('.claude-plugin/marketplace.json'))"
