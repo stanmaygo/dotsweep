@@ -25,7 +25,7 @@ free** — the one wrong answer that costs someone money.
 **Or from this repo:**
 
 ```sh
-npx skills add stanmaygo/dotsweep-skill
+npx skills add stanmaygo/dotsweep
 ```
 
 **Or link it into any harness that loads skill instructions:**
@@ -37,7 +37,7 @@ ln -s "$PWD/skills/dotsweep" <your-skills-dir>/dotsweep
 **Or as a Claude Code plugin:**
 
 ```
-/plugin marketplace add stanmaygo/dotsweep-skill
+/plugin marketplace add stanmaygo/dotsweep
 /plugin install dotsweep@dotsweep
 ```
 
