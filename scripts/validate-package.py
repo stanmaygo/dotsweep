@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Check the packaging surfaces a skill installer sees, without any dependency.
 
-The engine has parallel Go and vitest suites and CI runs both. Nothing tested
+The prompt is exercised by suites that live with the engine. Nothing tested
 the *packaging*: the frontmatter a harness parses, the version in three files,
 whether the root SKILL.md still points at a real file. Those break silently —
 the tests stay green while `npx skills add` or `/plugin install` gets nothing.

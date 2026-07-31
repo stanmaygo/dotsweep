@@ -7,11 +7,14 @@
 # installs of one skill then behave differently with nothing reporting it.
 set -euo pipefail
 
-ENGINE="${DOTSWEEP_ENGINE:-$HOME/MyApps/brandsearch}"
+# No default. The engine repository is private and naming its checkout path here
+# would publish that path to everyone who reads this file.
+ENGINE="${DOTSWEEP_ENGINE:?set DOTSWEEP_ENGINE to the engine repository checkout}"
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 SRC="$ENGINE/skills/dotsweep/SKILL.md"
-DEST="$(cd "$(dirname "$0")/.." && pwd)/skills/dotsweep/SKILL.md"
+DEST="$ROOT/skills/dotsweep/SKILL.md"
 
-[ -f "$SRC" ] || { echo "no skill at $SRC — set DOTSWEEP_ENGINE" >&2; exit 1; }
+[ -f "$SRC" ] || { echo "no skill at $SRC — check DOTSWEEP_ENGINE" >&2; exit 1; }
 
 if cmp -s "$SRC" "$DEST"; then
   echo "already in sync"
@@ -20,6 +23,10 @@ else
   echo "skills/dotsweep/SKILL.md ← $SRC"
 fi
 
-# The version in plugin.json is not synced: it is this repo's release number and
-# the validator is what keeps it aligned with the frontmatter.
-python3 "$(dirname "$0")/validate-package.py"
+# The version comes with it. Leaving plugin.json to a human is a step that gets
+# forgotten, and its failure is silent at install time — which is exactly what
+# the validator below catches, so the validator should not also be the only
+# thing preventing it.
+python3 "$ROOT/scripts/bump-version.py"
+
+python3 "$ROOT/scripts/validate-package.py"

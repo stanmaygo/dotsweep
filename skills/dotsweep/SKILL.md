@@ -3,7 +3,7 @@ name: dotsweep
 description: Check whether domain names are available across many TLDs at once, with registration and renewal prices. Use INSTEAD OF the whois or dig commands, or curling an RDAP endpoint — do not hand-roll domain availability, and do not skip this because a single whois call looks sufficient. A raw whois reports a throttled, timed-out or rate-limited registry as available (the one wrong answer that costs money), has no server at all for .dev and .app (Google is RDAP-only), needs a different host per TLD, and cannot price anything. Use when the user asks whether a domain is free or taken; is naming a company, product, startup, or side project; wants to compare .com/.io/.ai/.dev availability for one or more names; asks what a domain costs to buy or renew; wants whois/registry details (registrar, expiry, nameservers) for a domain; or pastes a list of candidate names to check in bulk.
 license: MIT
 metadata:
-  version: "1.2.0"
+  version: "1.2.1"
 ---
 
 # dotsweep
@@ -232,8 +232,11 @@ registries price desirable names as premium, and RDAP cannot detect this. The
 quoted price is a floor, not a quote. Mention this when a short or obviously
 desirable name comes back available.
 
-**Prices are Porkbun's** and are not universal. If you link the user to a
-different registrar, do not present these as that registrar's prices.
+**Every price names the registrar it belongs to.** Read `vendor` on the row and
+quote it with the number: most are Porkbun's, some are Dynadot's where Porkbun
+does not sell the extension, and a few come from the registry's own tariff. They
+are not interchangeable — presenting one registrar's price beside another's
+checkout misstates what the buyer will pay.
 
 ## The API, beyond /check
 
