@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Check the packaging surfaces a skill installer sees, without any dependency.
 
-The prompt is exercised by suites that live with the engine. Nothing tested
+The engine has parallel Go and vitest suites and CI runs both. Nothing tested
 the *packaging*: the frontmatter a harness parses, the version in three files,
 whether the root SKILL.md still points at a real file. Those break silently —
 the tests stay green while `npx skills add` or `/plugin install` gets nothing.
@@ -29,23 +29,31 @@ def fail(message: str) -> None:
 
 
 # The root SKILL.md is the artifact a manual installer copies and the path the
-# skills CLI looks for first. It is a symlink so there is exactly one copy of
-# the prompt in the repo; a broken link is the failure this catches, because
-# nothing else in CI reads it.
+# skills CLI looks for first. What matters is that it holds the same prompt as
+# skills/dotsweep/SKILL.md — one prompt, no drift.
+#
+# The check is on content rather than on the mechanism, because the mechanism
+# that enforced it was a symlink and a symlink does not survive publication:
+# raw.githubusercontent.com serves the *link target* as the file body, so
+# fetching the root SKILL.md over HTTP returned the 24-byte string
+# "skills/dotsweep/SKILL.md" instead of a skill. Anything reading it without a
+# git clone — the GitHub UI, a raw URL, a manual copy — got a path. Comparing
+# bytes accepts a symlink where one works and a real copy where one does not,
+# and asserts the thing actually worth asserting.
 root_skill = ROOT / "SKILL.md"
-if not root_skill.is_symlink():
-    fail("SKILL.md at the repo root must be a symlink, not a second copy of the prompt")
-elif root_skill.resolve() != SKILL_PATH.resolve():
-    fail(f"SKILL.md points at {root_skill.resolve()}, want {SKILL_PATH}")
+if not root_skill.exists():
+    fail("SKILL.md is missing from the repo root")
+elif root_skill.read_bytes() != SKILL_PATH.read_bytes():
+    fail("SKILL.md at the root differs from skills/dotsweep/SKILL.md — two prompts have drifted")
 
 # Codex and Warp read AGENTS.md, Claude Code reads CLAUDE.md, and the contract
-# is the same one. A symlink rather than a copy, because two files drift and the
-# packaging rules below are exactly what a second agent needs to not break.
+# is the same one. Same rule and same reason as above.
 agents_md = ROOT / "AGENTS.md"
-if not agents_md.is_symlink():
-    fail("AGENTS.md must be a symlink to CLAUDE.md, not a second copy")
-elif agents_md.resolve() != (ROOT / "CLAUDE.md").resolve():
-    fail(f"AGENTS.md points at {agents_md.resolve()}, want CLAUDE.md")
+claude_md = ROOT / "CLAUDE.md"
+if not agents_md.exists():
+    fail("AGENTS.md is missing")
+elif agents_md.read_bytes() != claude_md.read_bytes():
+    fail("AGENTS.md differs from CLAUDE.md — two sets of instructions have drifted")
 
 # The skill is not Claude-only, and the thing that keeps that true is that
 # nothing in the prompt names a harness. .claude-plugin/ is optional packaging

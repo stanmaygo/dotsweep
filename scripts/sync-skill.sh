@@ -23,6 +23,15 @@ else
   echo "skills/dotsweep/SKILL.md ← $SRC"
 fi
 
+# Both paths are real files rather than one being a symlink to the other.
+# raw.githubusercontent.com serves a symlink's *target* as the body, so a
+# published root SKILL.md returned the 24-byte string "skills/dotsweep/SKILL.md"
+# to anything that read it without cloning. Copying is what survives; the
+# validator asserts the two are byte-identical, which is the invariant the
+# symlink was standing in for.
+cp "$DEST" "$ROOT/SKILL.md"
+cp "$ROOT/CLAUDE.md" "$ROOT/AGENTS.md"
+
 # The version comes with it. Leaving plugin.json to a human is a step that gets
 # forgotten, and its failure is silent at install time — which is exactly what
 # the validator below catches, so the validator should not also be the only
