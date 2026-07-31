@@ -5,7 +5,7 @@
 name: 'Domain watch and availability check — dotsweep'
 # The Marketplace rejects a description of 125 characters or more, and validates
 # it at the release's tag rather than on the default branch.
-description: 'Watch a domain until it frees up, or catch one of yours lapsing. Availability, renewal price and eligibility. No API key.'
+description: 'Watch a domain until it frees up, or catch one of yours lapsing. Availability and renewal price, 1,200+ TLDs. No API key.'
 author: 'dotsweep'
 
 branding:
