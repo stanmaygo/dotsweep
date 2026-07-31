@@ -116,7 +116,11 @@ missing name reads exactly like a free one. `closed` is separate because a
 `.brand` TLD answers with a genuine not-found: `shoes.nike` is unregistered and
 unbuyable at once, so counting it as available would be true and useless.
 
-Watch a name and open an issue the day it frees up:
+Watch a name and get told the day it frees up. **Put this in a repo you already
+commit to**, not a fresh one: GitHub disables a scheduled workflow after 60 days
+without a new commit in a public repo, and a release, tag, issue or PR does not
+reset that clock. The failure is silent, which on a watch that runs for months is
+the whole point lost.
 
 ```yaml
 on:
