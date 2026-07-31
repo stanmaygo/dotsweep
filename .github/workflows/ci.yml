@@ -9,6 +9,25 @@ on:
   pull_request:
 
 jobs:
+  # This machine's default git identity belongs to a different account, and a
+  # clone made to cut a release inherits it. That published a commit under the
+  # wrong person once; the amend was two minutes behind the push. A local
+  # `user.email` is the fix and this is the thing that notices when it is missing.
+  author:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 50 }
+      - name: every commit is authored by the owner
+        run: |
+          bad="$(git log --format='%H %ae' -50 | grep -v ' stanislav.mayorov@me.com$' || true)"
+          if [ -n "$bad" ]; then
+            echo "::error::commits authored by someone other than the repo owner:"
+            echo "$bad"
+            echo "fix: git config user.email stanislav.mayorov@me.com, then amend"
+            exit 1
+          fi
+
   package:
     runs-on: ubuntu-latest
     steps:
