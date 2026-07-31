@@ -1,0 +1,87 @@
+name: 'dotsweep domain check'
+description: 'Check domain availability across any TLD, with price, minimum term and eligibility. Never reports an unreachable registry as available.'
+author: 'dotsweep'
+
+branding:
+  icon: 'search'
+  color: 'blue'
+
+inputs:
+  domains:
+    description: |
+      Domains to check, separated by whitespace, commas or newlines.
+      With `tlds` set, these are treated as bare labels instead.
+    required: true
+  tlds:
+    description: 'Extensions to append to every entry in `domains`. Leave empty to check the names as given.'
+    required: false
+    default: ''
+  fail-if-available:
+    description: 'Fail the step if any name is confirmed available.'
+    required: false
+    default: 'false'
+  fail-if-taken:
+    description: 'Fail the step if any name is confirmed taken.'
+    required: false
+    default: 'false'
+  fail-if-unconfirmed:
+    description: |
+      Fail the step if any name came back unconfirmed. Off by default: a
+      throttled registry is a fact about the network, not about your names.
+    required: false
+    default: 'false'
+  summary:
+    description: 'Write a results table to the job summary.'
+    required: false
+    default: 'true'
+  api:
+    description: 'API base URL. Override only to point at your own deployment.'
+    required: false
+    default: 'https://dotsweep.com'
+
+outputs:
+  results:
+    description: 'Every result as a compact JSON array.'
+    value: ${{ steps.check.outputs.results }}
+  available:
+    description: 'Space-separated names confirmed available by a registry.'
+    value: ${{ steps.check.outputs.available }}
+  taken:
+    description: 'Space-separated names confirmed registered.'
+    value: ${{ steps.check.outputs.taken }}
+  closed:
+    description: |
+      Space-separated names on a TLD nobody may register — a .brand reserved for
+      its trademark owner, or a registry ICANN terminated. Unregistered and
+      unbuyable at once, so they are kept out of `available`.
+    value: ${{ steps.check.outputs.closed }}
+  unconfirmed:
+    description: 'Space-separated names no registry would confirm. Not a synonym for available.'
+    value: ${{ steps.check.outputs.unconfirmed }}
+  available-count:
+    description: 'How many names are confirmed available.'
+    value: ${{ steps.check.outputs.available-count }}
+  taken-count:
+    description: 'How many names are confirmed registered.'
+    value: ${{ steps.check.outputs.taken-count }}
+  closed-count:
+    description: 'How many names sit on a TLD nobody may register.'
+    value: ${{ steps.check.outputs.closed-count }}
+  unconfirmed-count:
+    description: 'How many names came back unconfirmed.'
+    value: ${{ steps.check.outputs.unconfirmed-count }}
+
+runs:
+  using: composite
+  steps:
+    - id: check
+      shell: bash
+      run: bash "${{ github.action_path }}/scripts/action-check.sh"
+      env:
+        INPUT_DOMAINS: ${{ inputs.domains }}
+        INPUT_TLDS: ${{ inputs.tlds }}
+        INPUT_FAIL_IF_AVAILABLE: ${{ inputs.fail-if-available }}
+        INPUT_FAIL_IF_TAKEN: ${{ inputs.fail-if-taken }}
+        INPUT_FAIL_IF_UNCONFIRMED: ${{ inputs.fail-if-unconfirmed }}
+        INPUT_SUMMARY: ${{ inputs.summary }}
+        INPUT_API: ${{ inputs.api }}

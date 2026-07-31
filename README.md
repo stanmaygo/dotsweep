@@ -92,6 +92,45 @@ https://dotsweep.com/mcp
 Tools: `check_domains`, `whois`, `list_tlds`. Setup click-path at
 [dotsweep.com/setup](https://dotsweep.com/setup).
 
+## And a GitHub Action
+
+For the cases with no agent in the loop — watching a name you want until it
+drops, or checking a list of candidates on a schedule.
+
+```yaml
+- uses: stanmaygo/dotsweep@v1
+  id: names
+  with:
+    domains: acme brandnew
+    tlds: com io ai dev
+- run: echo "free: ${{ steps.names.outputs.available }}"
+```
+
+Outputs are `available`, `taken`, `closed`, `unconfirmed`, a `-count` for each,
+and `results` with the full JSON. It writes a table to the job summary.
+
+**The four buckets are the whole point, and three of them are not `available`.**
+A rate-limited registry lands in `unconfirmed`, never in `available` — and if
+the API cannot be reached at all the step fails rather than answering, because a
+missing name reads exactly like a free one. `closed` is separate because a
+`.brand` TLD answers with a genuine not-found: `shoes.nike` is unregistered and
+unbuyable at once, so counting it as available would be true and useless.
+
+Watch a name and open an issue the day it frees up:
+
+```yaml
+on:
+  schedule: [{ cron: '0 9 * * *' }]
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: stanmaygo/dotsweep@v1
+        with:
+          domains: the-one-i-want.com
+          fail-if-available: true
+```
+
 ## Endpoint
 
 The skill calls `https://dotsweep.com` by default and honours `DOTSWEEP_API`
